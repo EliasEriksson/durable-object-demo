@@ -10,9 +10,8 @@ export default {
 
 const handleRequest = async (request: Request, environment: Environment): Promise<Response> => {
   const url = new URL(request.url)
-  const match = url.pathname.match(/(?<=^|\/)([^/])+(?=\/|$)/g) /* /finds/these/words/ */
-  if (!match || match.length > 3) return new Response("badly formatted url.", { status: 400}) 
-  const [objectName] = match
+  const [objectName] = url.pathname.match(/(?<=^|\/)([^/])+(?=\/|$)/g) ?? [undefined] /* /finds/these/words/ */
+  if (objectName == undefined) return new Response("badly formatted url.", { status: 400}) 
   const id = environment.counter.idFromName(objectName)
   const stub = environment.counter.get(id)
   return await stub.fetch(request)
@@ -27,8 +26,8 @@ export class Counter {
   handleResource = async (resource: string, method: string): Promise<Response> => {
     let current = await this.state.storage.get<number>(resource) ?? 0
     switch (method) {
-      case "increment": await this.state.storage.put<number>(resource, ++current); break
-      case "decrement": await this.state.storage.put<number>(resource, --current); break
+      case "add": await this.state.storage.put<number>(resource, ++current); break
+      case "remove": await this.state.storage.put<number>(resource, --current); break
       case "read": break
       default: return new Response("action not supported.", { status: 400 })
     }
@@ -40,9 +39,9 @@ export class Counter {
 
   async fetch(request: Request): Promise<Response>{
     const url = new URL(request.url)
-    const match = url.pathname.match(/(?<=^|\/)([^/])+(?=\/|$)/g) /* /finds/these/words/ */
-    if (!match || (match.length != 1 && match.length != 3)) return new Response("badly formatted url.", { status: 400 })
-    const [_, resource, action] = match
-    return resource ? this.handleResource(resource, action) : this.handleList()
+    const [_, resource, action] = url.pathname.match(/(?<=^|\/)([^/])+(?=\/|$)/g) ?? [undefined] /* /finds/these/words/ */
+    if (resource == undefined && action == undefined) return await this.handleList()
+    else if (resource != undefined && action != undefined) return await this.handleResource(resource, action)
+    else return new Response("badly formatted url.", { status: 400 })
   }
 }
