@@ -1,0 +1,24 @@
+name = "durable-object-demo"
+type = "javascript"
+account_id = ""
+workers_dev = true
+
+[build]
+command = "npm install && npm run build"
+[build.upload]
+format = "modules"
+dir = "dist"
+main = "index.mjs"
+
+[durable_objects]
+bindings = [
+	{ name = "counter", class_name = "Counter" },
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Counter"]
+
+[miniflare]
+durable_objects_persist = "./.miniflare/durable-objects/"
+kv_persist = "./.miniflare/kv/"
