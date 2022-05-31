@@ -11,5 +11,12 @@ export default [{
 		sourcemapPathTransform: (relativeSourcePath, _) => path.resolve(__dirname, relativeSourcePath.replace(/^(..\/)+/, ""))
 	},
 	plugins: [typescript({ tsconfig: "./tsconfig.json" })],
+	watch: {
+		clearScreen: false,
+	},
+	onwarn: function(warning) {
+    if ( warning.code !== 'THIS_IS_UNDEFINED' )
+    	console.warn( warning.message );
+	},
 },
 ]

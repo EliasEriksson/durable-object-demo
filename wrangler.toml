@@ -5,7 +5,7 @@ account_id = ""
 workers_dev = true
 
 [build]
-command = "npm run build:local:api"
+command = "npm run build:api"
 [build.upload]
 format = "modules"
 dir = "dist"
