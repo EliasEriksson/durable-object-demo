@@ -22,7 +22,7 @@ export class Counter {
   constructor(
     private readonly state: DurableObjectState, 
     private readonly environment: Environment
-    ) {}
+  ) {}
   handleResource = async (resource: string, method: string): Promise<Response> => {
     let current = await this.state.storage.get<number>(resource) ?? 0
     switch (method) {
